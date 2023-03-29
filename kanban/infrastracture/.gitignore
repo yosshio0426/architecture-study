@@ -27,3 +27,7 @@ override.tf.json
 
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
 # example: *tfplan*
+
+# この辺には個人の環境情報が入るのでignoreする
+provider.tf
+backend.tf
