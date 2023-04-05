@@ -50,3 +50,43 @@ module "api_gateway" {
   default_stage_access_log_destination_arn = aws_cloudwatch_log_group.api_gateway_log.arn
   default_stage_access_log_format = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
 }
+
+module "dynamodb-table" {
+  source  = "terraform-aws-modules/dynamodb-table/aws"
+  version = "3.2.0"
+
+  name = "kanban"
+
+  billing_mode = "PAY_PER_REQUEST"
+
+  attributes = [
+    {
+      name = "kanban-physical-id"
+      type = "S"
+    },
+    {
+      name = "entity-physical-id"
+      type = "S"
+    },
+    {
+      name = "task-priority"
+      type = "N"
+    },
+    {
+      name = "task-closed-timestamp"
+      type = "N"
+    }
+  ]
+
+  hash_key = "kanban-physical-id"
+  range_key = "entity-physical-id"
+  local_secondary_indexes = [{
+    name : "idx-priority"
+    range_key : "task-priority"
+    projection_type : "ALL"
+  }, {
+    name : "idx-closed-timestamp"
+    range_key :"task-closed-timestamp"
+    projection_type : "ALL"
+  }]
+}
