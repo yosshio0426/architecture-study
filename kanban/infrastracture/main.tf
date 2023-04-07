@@ -90,3 +90,43 @@ module "dynamodb-table" {
     projection_type : "ALL"
   }]
 }
+
+module "dynamodb_access_policy" {
+  source = "./modules/iam_policy"
+
+  path = "/kanban/"
+  name = "kanban-dynamodb-access"
+  statements = [{
+    actions : [
+      "dynamodb:Query",
+      "dynamodb:PartiQLSelect",
+    ]
+    resources : [
+      module.dynamodb-table.dynamodb_table_arn,
+      "${module.dynamodb-table.dynamodb_table_arn}/index/idx-priority",
+      "${module.dynamodb-table.dynamodb_table_arn}/index/idx-closed-timestamp",
+    ]
+  }, {
+    actions : [
+      "dynamodb:DescribeTable",
+
+      "dynamodb:GetItem",
+      "dynamodb:BatchGetItem",
+
+      "dynamodb:ConditionCheckItem",
+
+      "dynamodb:PutItem",
+      "dynamodb:UpdateItem",
+      "dynamodb:BatchWriteItem",
+      "dynamodb:PartiQLInsert",
+      "dynamodb:PartiQLUpdate",
+
+      "dynamodb:DeleteItem",
+      "dynamodb:PartiQLDelete",
+    ]
+    resources : [
+      module.dynamodb-table.dynamodb_table_arn
+    ]
+  }]
+}
+
